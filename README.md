@@ -1,0 +1,1 @@
+# Библиотека для плагина [nativescript-serialport-plugin](https://github.com/b0939261761/nativescript-serialport-plugin)
