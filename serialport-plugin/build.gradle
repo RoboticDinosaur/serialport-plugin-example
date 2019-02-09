@@ -30,9 +30,8 @@ task deleteOldJar(type: Delete) {
 task exportJar(type: Copy) {
     from('build/outputs/aar')
     into('release')
-    include('app-release.aar')
-    // name the plugin
-    rename('app-release.aar','serialport-plugin.aar')
+    include('serialport-plugin-release.aar')
+    rename('serialport-plugin-release.aar','serialport-plugin.aar')
 }
 
 exportJar.dependsOn(deleteOldJar, build)

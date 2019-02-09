@@ -9,6 +9,7 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.felhr.usbserial.UsbSerialDevice;
 import com.felhr.usbserial.UsbSerialInterface;
@@ -24,17 +25,17 @@ public class NSSerialport {
     private static final String ACTION_USB_ATTACHED = "android.hardware.usb.action.USB_DEVICE_ATTACHED";
     private static final String ACTION_USB_DETACHED = "android.hardware.usb.action.USB_DEVICE_DETACHED";
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
-
     public static final String ACTION_USB_PERMISSION_GRANTED = "USB_PERMISSION_GRANTED";
     public static final String ACTION_USB_PERMISSION_NOT_GRANTED = "USB_PERMISSION_NOT_GRANTED";
     public static final String ACTION_USB_NOT_SUPPORTED = "USB_NOT_SUPPORTED";
     public static final String ACTION_USB_DISCONNECTED = "USB_DISCONNECTED";
     public static final String ACTION_USB_CONNECT = "USB_CONNECT";
     public static final String ACTION_USB_NOT_OPENED = "USB_NOT_OPENED";
-    public static final String ACTION_USB_NO_DEVICE = "ACTION_USB_NO_DEVICE";
     public static final String ON_READ_DATA_FROM_PORT = "ON_READ_DATA_FROM_PORT";
 
     //Connection Settings
+    private int VENDOR_ID = 0;
+    private int PRODUCT_ID = 0;
     private int BAUD_RATE    = 115200;
     private int DATA_BIT     = UsbSerialInterface.DATA_BITS_8;
     private int STOP_BIT     = UsbSerialInterface.STOP_BITS_1;
@@ -65,7 +66,8 @@ public class NSSerialport {
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case ACTION_USB_ATTACHED:
-                    if(autoConnect && currentDevice != null ) {
+                    if(autoConnect && VENDOR_ID != 0 && PRODUCT_ID != 0) {
+                        setCurrentDevice(VENDOR_ID, PRODUCT_ID);
                         requestUserPermission();
                     }
                     break;
@@ -87,6 +89,7 @@ public class NSSerialport {
         filter.addAction(ACTION_USB_PERMISSION);
         currentContext.registerReceiver(mUsbReceiver, filter);
     }
+
 
     public void setBaudRate(int BAUD_RATE) {
         this.BAUD_RATE = BAUD_RATE;
@@ -151,17 +154,20 @@ public class NSSerialport {
         return devicesList;
     }
 
-    public void setCurrentDevice(int vendorId, int productId) {
+    public boolean setCurrentDevice(int vendorId, int productId) {
         getDeviceList();
         currentDevice = null;
         for( int i = 0; i < devicesList.size(); ++i) {
             UsbDevice device = devicesList.get(i);
             if (device.getVendorId() == vendorId && device.getProductId() == productId ) {
                 currentDevice = device;
+                VENDOR_ID = vendorId;
+                PRODUCT_ID = productId;
+                return true;
             }
         }
 
-        currentContext.sendBroadcast(new Intent(ACTION_USB_NO_DEVICE));
+        return false;
     }
 
     private void startConnection(boolean granted) {

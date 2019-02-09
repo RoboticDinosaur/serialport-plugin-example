@@ -1,13 +1,16 @@
 package org.nativescript.b360124.serialport_plugin_example;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import org.nativescript.b360124.nsserialport.NSSerialport;
@@ -67,7 +70,8 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(mUsbReceiver, filter);
 
         nsSerialport = new NSSerialport(getApplicationContext());
-        nsSerialport.setCurrentDevice(0x1A86, 0x7523);
+        boolean isSetDevice = nsSerialport.setCurrentDevice(0x1A86, 0x7523);
+        nsSerialport.setAutoConnect(true);
         nsSerialport.connect();
     }
 
