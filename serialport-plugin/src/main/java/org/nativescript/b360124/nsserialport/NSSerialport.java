@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
+
 import com.felhr.usbserial.UsbSerialDevice;
 import com.felhr.usbserial.UsbSerialInterface;
 
@@ -120,9 +121,7 @@ public class NSSerialport {
         this.autoConnect = autoConnect;
     }
 
-    public void writeString(String data) {
-        serialPort.write(data.getBytes());
-    }
+    public void writeString(String data) { new WriteThread(data).start(); }
 
     public void connect() {
         if(!isConnect) {
@@ -212,6 +211,18 @@ public class NSSerialport {
         }
     }
 
+
+    private class WriteThread extends Thread {
+        private String data;
+
+        public WriteThread (String data) { this.data = data; }
+
+        @Override
+        public void run() {
+            serialPort.write(data.getBytes());
+        }
+    }
+
     private void stopConnection() {
         if (!isConnect) {
             return;
@@ -228,6 +239,7 @@ public class NSSerialport {
         public void onReceivedData(byte[] bytes) {
             Intent intent = new Intent(DEVICE_READ_DATA);
             intent.putExtra("data", bytes);
+
             currentContext.sendBroadcast(intent);
         }
     };

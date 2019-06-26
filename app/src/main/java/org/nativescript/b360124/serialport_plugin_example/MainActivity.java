@@ -110,10 +110,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 nsSerialport.writeString("G28 X0\n");
                 nsSerialport.writeString("G1X80F10000\n");
-                nsSerialport.writeString("M400\n");
                 nsSerialport.writeString("G28 Y0\n");
                 nsSerialport.writeString("G1X80F10000\n");
-                nsSerialport.writeString("M400\n");
             }
         });
     }
